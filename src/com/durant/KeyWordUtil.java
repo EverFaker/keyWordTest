@@ -47,48 +47,82 @@ public class KeyWordUtil {
         this.dictionaryMap = dictionaryMap;
     }
 
-
+    /**
+     * 将list的词语转化成一个词典map
+     * @param wordList
+     * @return
+     */
     private Map<String, Object> handleToMap(List<String> wordList) {
+        /**
+         * 判断是否为空
+         */
         if (wordList != null) {
-            return null;
+            Map<String, Object> map = new HashMap<>(wordList.size());
+            Iterator<String> ite = wordList.iterator();
+            getWantMap(ite,map);
+            return map;
         }
-        Map<String, Object> map = new HashMap<>(wordList.size());
-        Iterator<String> ite = wordList.iterator();
-        getWantMap(ite,map);
-        return map;
+        return null;
     }
 
 
     /**
-     * 抽取相同部分成方法
+     * 抽取组装list成map和组装set成map相同部分成方法,将迭代器里面的值转化成词典map
      * @param ite
      * @param map
      */
     private void getWantMap(Iterator<String> ite,Map<String, Object> map){
         Map<String, Object> curMap;
+
         while (ite.hasNext()) {
-            // 取出当前的关键词
+            /**
+             * 取出当前的关键词
+             */
             String word = ite.next();
             curMap = map;
+            /**
+             * 循环关键词长度，将其放入到map中去
+             */
             int len = word.length();
             for (int i = 0; i < len; i++) {
+                /**
+                 * 取出关键词第一个字
+                 */
                 String key = String.valueOf(word.charAt(i));
+                /**
+                 * 从词典当中取key为关键字第一个字的map，判断其是否存在
+                 */
                 Map<String, Object> wordMap = (Map<String, Object>) curMap.get(key);
+
+                /**
+                 * 如果为空，证明还没有放入该关键词，循环关键词中的每个字，以每个字作为map的key，直到词结束，将isEnd的值赋值为1，否则为0
+                 */
                 if (wordMap == null) {
-                    wordMap = new HashMap<>();
+                    wordMap = new HashMap<>(2);
+                    /**
+                     *  先赋值为0，后面再判断是否结束，然后再做更改
+                     */
                     wordMap.put("isEnd", "0");
                     curMap.put(key, wordMap);
                     curMap = wordMap;
-                }
-                else {
+                }else {
                     curMap = wordMap;
                 }
+                /**
+                 * 如果循环的长度到达了最大长度，那么将isEnd赋值为1，表示是最后一个字，意思也就是该词已经结束了
+                 */
                 if (i == len - 1) {
                     curMap.put("isEnd", "1");
                 }
             }
         }
     }
+
+    /**
+     *  将set的值转换成词典map
+     * @param wordSet
+     * @return
+     */
     private Map<String, Object> handleToMap(Set<String> wordSet) {
         /**
          * 保证关键字集合不为空
@@ -105,7 +139,6 @@ public class KeyWordUtil {
         return map;
     }
 
-    @SuppressWarnings("unchecked")
     public int checkWord(String text, int beginIndex) {
         if (dictionaryMap == null) {
             throw new RuntimeException("字典不能为空！");
